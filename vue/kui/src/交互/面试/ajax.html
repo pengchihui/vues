@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html style="font-size: 64.6875px;">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" type="text/css" href="/expo/new/css/new_file_index.css" />
+		<title></title>
+	</head>
+	<body>
+		<div class="homepage clearfix">
+			<div class="bg_picture" style="background: url(/uploads/20190524/db96a1a89315f9eacaa832458db293ef.jpg) repeat scroll top left; background-size: 100%;"></div>
+
+
+			<ul class="sign_in fl">
+				<li><input id="inp_o" type="text" value="请输入姓名" /></li>
+				<li><input id="inp_n" type="text" value="请输入手机号" /></li>
+				<li><input id="inp_e" type="text" value="请输入邀请工号" /></li>
+				<li class="four"><a href="#" id="clk">提&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;交</a></li>
+			</ul>
+
+			<select id="prov" class="prov"  onchange="showCity(this);">
+                <option>请选择省份</option>
+            </select>
+            <!--城市选择-->
+            <select id="city" class="city"  onchange="showCountry(this);">
+                <option>请选择城市</option>
+            </select>
+            <!--县区选择-->
+            <select id="country" class="country"  onchange="selecCountry(this);">
+                <option>请选择县区</option>
+            </select>
+
+			<div class="bounced" id="bounced">
+				<span id="neiro" style="left: 2.2rem;"></span>
+			</div>
+
+			<div class="pic_t" id="pic_t"></div>
+			<div class="pic_b" id="pic_b"></div>
+		</div>
+
+
+		<script src="/public/js/jweixin-1.2.0.js"></script>
+		<script src="/expo/new/js/new_file.js"></script>
+		<script src="/expo/new/js/jquery-1.7.2.js"></script>
+		<script src="/expo/new/js/city.js"></script>
+		<script src="/expo/new/js/method1.js"></script>
+		<script type="text/javascript">
+			var bounced=document.getElementById('bounced');
+			var neiro=document.getElementById('neiro');
+			var clk = document.getElementById('clk'); //提交
+			var pic_t=document.getElementById('pic_t');
+			var pic_b=document.getElementById('pic_b');
+
+
+
+			clk.onclick = function() { //点击提交时
+				//var a = provice[current.prov].name;//省
+				//var b = provice[current.prov]["city"][current.city].name; //市
+				//var c = provice[current.prov]["city"][current.city].districtAndCounty[current.country];//区县
+				var name_o=o.value;
+				var regName =/^[\u4E00-\u9FA5\uf900-\ufa2d·s]{2,20}$/;
+				if(!(/^[\u4E00-\u9FA5\uf900-\ufa2d·s]{2,20}$/.test(name_o))){
+					bounced.style.display='block';
+					neiro.innerText="真实姓名填写有误";
+					neiro.style.left='1.4rem';
+				}else{
+					var phone_n = n.value;
+					if (!(/^1[3|4|5|8][0-9]\d{4,8}$/.test(phone_n))) {
+						bounced.style.display='block';
+						neiro.innerText="手机号码有误，请重填";
+						neiro.style.left='1.4rem';
+					} else {
+						$.ajax({
+							type: "POST",
+							async: false,
+							url: "/conference/conference_add",
+							dataType: "json",
+
+							data: {
+								name: o.value,
+								phone: n.value,
+								number: e.value,
+								province: provice[current.prov].name,
+								city: provice[current.prov]["city"][current.city].name,
+								county: provice[current.prov]["city"][current.city].districtAndCounty[current.country],
+								conference_id: '1',
+								openid :'oRXdk50U_tkuZnSlFhoriyF1HVgs',
+								scene :'',
+							},
+							success: function(date) {
+								if (date.code == '2000') {
+									// alert('签到成功')
+									bounced.style.display='block';
+									pic_b.style.display='block';
+									pic_t.style.display='block';
+								} else {
+									// alert(date.msg)
+									bounced.style.display='block';
+									neiro.innerText=date.msg;
+									neiro.style.left='2.1rem';
+								}
+
+							}
+						})
+
+					}
+
+				}
+
+
+
+
+
+			}
+
+
+			bounced.onclick=function(){
+				bounced.style.display='none';
+				pic_b.style.display='none';
+				pic_t.style.display='none';
+			}
+		</script>
+		<script type="text/javascript">
+			wx.config({
+				debug: false,
+				appId: 'wx354e09b65fd8eb90',
+				timestamp: '1567767382',
+				nonceStr: 'hONkCqvpxF6tqhkm',
+				signature: 'dd9c30100f403d0da65cd89b0aee07afe16696bd',
+				jsApiList: ['hideMenuItems', 'onMenuShareAppMessage', 'onMenuShareTimeline', ]
+			});
+			wx.ready(function() {
+				// 在这里调用 API
+				var title = "邀请您参加会场";
+				var desc = "说出您真实的感受";
+				var links = "http://ai.qm-vip.com/Conference/?conference_id=1";
+				var imgUrl = '';
+				//分享微信朋友
+				wx.onMenuShareAppMessage({
+					title: title, // 分享标题
+					desc: desc, // 分享描述
+					link: links,
+					imgUrl: imgUrl, // 分享图标
+					type: '', // 分享类型,music、video或link，不填默认为link
+					dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+					success: function() {
+						share('onMenuShareAppMessag1');
+						alert('已分享');
+						$('.share').css({
+							'display': 'none'
+						});
+					},
+					cancel: function() {
+						alert('取消分享');
+					}
+				});
+
+				//分享朋友圈
+				wx.onMenuShareTimeline({
+					title: title, // 分享标题
+					link: links, // 分享链接
+					imgUrl: imgUrl, // 分享图标
+					success: function() {
+						share('onMenuShareTimeline');
+						alert('已分享');
+					},
+					cancel: function() {
+						alert('取消分享');
+					}
+				});
+			});
+			wx.error(function(res) {
+				//alert(res.errMsg);
+			});
+
+			function share(str) {
+
+			}
+		</script>
+	</body>
+</html>
