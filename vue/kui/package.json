@@ -19,7 +19,7 @@
     "element-ui": "^2.12.0",
     "es6-promise": "^4.2.8",
     "iview": "^3.5.1",
-    "jquery": "^1.12.4",
+    "jquery": "^3.5.0",
     "qs.js": "^0.1.12",
     "sass": "^1.23.0-module.beta.1",
     "sass-resources-loader": "^2.0.1",
